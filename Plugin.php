@@ -29,6 +29,7 @@ class Plugin extends \MapasCulturais\Plugin
         }
         $app = App::i();
         $plugin = $this;
+        $app->view->includeGeocodingAssets();
         $app->view->enqueueScript("app", "locationPatch", "js/locationPatch.js");
         $app->view->enqueueScript("app", "customizable", "js/customizable.js");
         $app->hook("entity(<<Agent|Space>>).save:before", function () {
