@@ -58,11 +58,21 @@ class Plugin extends \MapasCulturais\Plugin
             if ($this instanceof \MapasCulturais\Controllers\Space) {
                 $type = ["slug" => "space", "class" => "Space", "display" => "Space"];
             }
-            $entity = self::selectEntity($type, $plugin->config["cutoff"]);
-            if (!$entity) {
-                $app->log->debug("A suitable entity of type {$type["display"]} was not found.");
-                $this->json([]);
-                return;
+            $entity = null;
+            if (isset($this->data["id"])) {
+                $entity = $app->repo($type["class"])->find(intval($this->data["id"]));
+                if ($entity && !$entity->canUser("edit")) {
+                    $app->log->debug("The user is not allowed to call with this syntax.");
+                    $this->errorJson(["message" => "User with ID {$app->user->id} cannot perform this operation."], 403);
+                    return;
+                }
+            } else {
+                $entity = self::selectEntity($type, $plugin->config["cutoff"]);
+                if (!$entity) {
+                    $app->log->debug("A suitable entity of type {$type["display"]} was not found.");
+                    $this->json([]);
+                    return;
+                }
             }
             $token = uniqid();
             $meta = $entity->getMetadata();
