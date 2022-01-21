@@ -4,18 +4,9 @@ $(function() {
         return (value ? value : fallback);
     }
 
-    function setIfNotNull(container, key, value)
+    function runLocationPatch(endpoint, onSuccess)
     {
-        if (value) {
-            container[key] = value;
-        }
-        return;
-    }
-
-    $(document).on("ready", function() {
-        var entity = (Math.random() > 0.5) ? "space" : "agent";
-        var endpoint = MapasCulturais.baseURL + entity + "/locationPatch/";
-        $.ajax({url: endpoint, type: "GET", success: function(r) {
+        $.ajax({url: endpoint, type: "GET", success: function (r) {
             if (r.length < 1) {
                 return;
             }
@@ -41,8 +32,11 @@ $(function() {
                 }
             }
             clearTimeout(window._geocoding_timeout);
-            window._geocoding_timeout = setTimeout(function() {
-                MapasCulturais.geocoder.geocode(parms, function(g) {
+            window._geocoding_timeout = setTimeout(function () {
+                if (!onSuccess) {
+                    onSuccess = function () { return; };
+                }
+                MapasCulturais.geocoder.geocode(parms, function (g) {
                     if (g.lat && g.lon) {
                         $.ajax({
                             url: endpoint,
@@ -51,7 +45,8 @@ $(function() {
                                 latitude: g.lat,
                                 longitude: g.lon,
                                 token: token
-                            }
+                            },
+                            success: onSuccess
                         });
                     } else {
                         parms["fullAddress"] = fallback;
@@ -64,7 +59,8 @@ $(function() {
                             $.ajax({
                                 url: endpoint,
                                 type: "POST",
-                                data: data
+                                data: data,
+                                success: onSuccess
                             });
                             return;
                         });
@@ -75,6 +71,31 @@ $(function() {
             }, 1000);
             return;
         }});
+        return;
+    }
+
+    function setIfNotNull(container, key, value)
+    {
+        if (value) {
+            container[key] = value;
+        }
+        return;
+    }
+
+    $(".js-update-geolocation").on("click", function () {
+        runLocationPatch((MapasCulturais.baseURL +
+                          MapasCulturais.entity.controllerID +
+                          "/locationPatch/" + MapasCulturais.entity.id),
+                         function () {
+                             window.location.reload();
+                             return;
+                         });
+        return;
+    });
+
+    $(document).on("ready", function () {
+        var entity = (Math.random() > 0.5) ? "space" : "agent";
+        runLocationPatch((MapasCulturais.baseURL + entity + "/locationPatch/"), null);
         return;
     });
 });
