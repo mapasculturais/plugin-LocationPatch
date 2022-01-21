@@ -32,6 +32,15 @@ class Plugin extends \MapasCulturais\Plugin
         $app->view->includeGeocodingAssets();
         $app->view->enqueueScript("app", "locationPatch", "js/locationPatch.js");
         $app->view->enqueueScript("app", "customizable", "js/customizable.js");
+        $app->hook("template(<<agent|space>>.<<single|edit>>.location-info):after", function () use ($app) {
+            /** @var MapasCulturais\Theme $this */
+            $entity = $this->controller->requestedEntity;
+            if ($entity->canUser("edit")) {
+                $app->view->jsObject["entity"]["controllerID"] = $this->controller->id;
+                $this->part("location-patch/update-geolocation-button");
+            }
+            return;
+        });
         $app->hook("entity(<<Agent|Space>>).save:before", function () {
             /** @var \MapasCulturais\Entity $this */
             if (($_SERVER["REQUEST_URI"] != "/agent/locationPatch/") &&
