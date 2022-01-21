@@ -35,6 +35,10 @@ $(function() {
                 setIfNotNull(parms, "state", r["elements"]["state"]);
                 setIfNotNull(parms, "postalCode", r["elements"]["postalcode"]);
                 setIfNotNull(parms, "country", r["elements"]["country"]);
+                if (parms["country"]) {
+                    parms["fullAddress"] = r["query"] +  ", " + parms["country"];
+                    fallback = r["fallback"] + ", " + parms["country"];
+                }
             }
             clearTimeout(window._geocoding_timeout);
             window._geocoding_timeout = setTimeout(function() {
