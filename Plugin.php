@@ -36,7 +36,7 @@ class Plugin extends \MapasCulturais\Plugin
         $app->hook("template(<<agent|space>>.<<single|edit>>.tab-about-service):end", function () use ($app) {
             /** @var MapasCulturais\Theme $this */
             $entity = $this->controller->requestedEntity;
-            if ($entity->canUser("edit")) {
+            if ($this->controller->action == 'edit' || $app->user->is('admin')) {
                 $app->view->jsObject["entity"]["controllerID"] = $this->controller->id;
                 $this->part("location-patch/update-geolocation-button");
             }
