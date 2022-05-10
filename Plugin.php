@@ -32,7 +32,8 @@ class Plugin extends \MapasCulturais\Plugin
         $app->view->includeGeocodingAssets();
         $app->view->enqueueScript("app", "locationPatch", "js/locationPatch.js");
         $app->view->enqueueScript("app", "customizable", "js/customizable.js");
-        $app->hook("template(<<agent|space>>.<<single|edit>>.location-info):after", function () use ($app) {
+        
+        $app->hook("template(<<agent|space>>.<<single|edit>>.tab-about-service):end", function () use ($app) {
             /** @var MapasCulturais\Theme $this */
             $entity = $this->controller->requestedEntity;
             if ($entity->canUser("edit")) {

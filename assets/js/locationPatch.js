@@ -93,9 +93,8 @@ $(function() {
         return;
     });
 
-    $(document).on("ready", function () {
-        var entity = (Math.random() > 0.5) ? "space" : "agent";
-        runLocationPatch((MapasCulturais.baseURL + entity + "/locationPatch/"), null);
-        return;
-    });
+    
+    var entity = (Math.random() > 0.5) ? "space" : "agent";
+    runLocationPatch((MapasCulturais.baseURL + entity + "/locationPatch/"), null);
+    
 });
